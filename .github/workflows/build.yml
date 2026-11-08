@@ -22,17 +22,24 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Auto-accept Android SDK Licenses
+      - name: Accept Licenses
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-      - name: Build APK with Capacitor
+      - name: Prepare Web Files & Build APK
         run: |
+          # 1. www folder banakar saari files usme daalna
+          mkdir -p www
+          find . -maxdepth 1 ! -name '.' ! -name '..' ! -name '.git' ! -name '.github' ! -name 'www' -exec cp -r {} www/ \;
+
+          # 2. Capacitor install & init
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init "MyApp" "com.clean.app" --web-dir .
+          npx cap init "Claudemax" "com.claudemax.app" --web-dir www
           npx cap add android
-          npx cap copy android
+          npx cap sync android
+
+          # 3. APK generate karna
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
@@ -42,4 +49,3 @@ jobs:
         with:
           name: Clean-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
-          
