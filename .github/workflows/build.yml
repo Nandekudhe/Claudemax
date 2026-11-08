@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Accept Licenses
         run: |
@@ -28,18 +28,15 @@ jobs:
 
       - name: Prepare Web Files & Build APK
         run: |
-          # 1. www folder banakar saari files usme daalna
           mkdir -p www
           find . -maxdepth 1 ! -name '.' ! -name '..' ! -name '.git' ! -name '.github' ! -name 'www' -exec cp -r {} www/ \;
 
-          # 2. Capacitor install & init
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android
           npx cap init "Claudemax" "com.claudemax.app" --web-dir www
           npx cap add android
           npx cap sync android
 
-          # 3. APK generate karna
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
